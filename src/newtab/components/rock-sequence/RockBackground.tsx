@@ -3,7 +3,7 @@ import { SpaceDustCanvas } from './SpaceDustCanvas';
 import { RockCanvas } from './RockCanvas';
 import { AmbientGlow } from './AmbientGlow';
 
-// complete full screen 3d rock sequence background layer with dynamic green rim glare
+// complete full screen 3d rock sequence background layer with lightweight gpu aurora plumes
 export const RockBackground: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -21,7 +21,7 @@ export const RockBackground: React.FC = () => {
       {/* background cosmic star dust */}
       <SpaceDustCanvas />
 
-      {/* dynamic hollow rim glare outside the rock perimeter */}
+      {/* lightweight organic dual polar aurora plumes */}
       <AmbientGlow />
 
       {/* 3d interactive rock sequence */}
