@@ -4,7 +4,7 @@ import { crx } from '@crxjs/vite-plugin';
 import path from 'path';
 import manifest from './manifest.json';
 
-// vite configuration for chrome extension with crxjs and path alias
+// vite configuration with explicit newtab html entry and crxjs
 export default defineConfig({
   plugins: [
     react(),
@@ -15,11 +15,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    port: 5173,
-    strictPort: true,
-    hmr: {
-      port: 5173,
+  build: {
+    rollupOptions: {
+      input: {
+        newtab: path.resolve(__dirname, 'src/newtab/index.html'),
+      },
     },
   },
 });
