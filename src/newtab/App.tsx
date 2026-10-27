@@ -7,10 +7,7 @@ import {
   useWidgetStore,
   type WidgetCatalogEntry,
 } from './components/dashboard';
-import {
-  Plus,
-  Compass,
-} from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 // authentic archivewalls new tab page architecture
 export const App: React.FC = () => {
@@ -39,44 +36,41 @@ export const App: React.FC = () => {
       {/* 3d rock sequence dynamic background */}
       <RockBackground />
 
-      {/* archivewalls top navigation header */}
-      <header className="relative z-30 w-full px-6 py-2.5 flex items-center justify-between text-xs text-white/70 bg-[#14171f] border-b border-[#252a36]">
-        {/* left branding */}
-        <div className="flex items-center space-x-2.5">
-          <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center text-white/80">
-            <Compass className="w-3.5 h-3.5" />
-          </div>
-          <span className="text-sm font-semibold text-white tracking-normal">
-            ArchiveWalls
-          </span>
-        </div>
-
-        {/* right actions */}
-        <div className="flex items-center space-x-2.5 text-white/70">
-          <button
-            type="button"
-            onClick={() => handleOpenAddWidget(0)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-md font-medium text-xs transition-colors"
-            title="Add new widget"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add Widget</span>
-          </button>
-        </div>
-      </header>
+      {/* top right floating add widget trigger without full navbar container */}
+      <div className="relative z-30 w-full px-6 pt-4 flex justify-end">
+        <button
+          type="button"
+          onClick={() => handleOpenAddWidget(0)}
+          className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-md font-medium text-xs transition-colors"
+          title="Add new widget"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span>Add Widget</span>
+        </button>
+      </div>
 
       {/* calm web search bar */}
-      <div className="relative z-30 w-full px-6 pt-5 pb-3 flex justify-center">
+      <div className="relative z-30 w-full px-6 pt-2 pb-3 flex justify-center">
         <SearchBar />
       </div>
 
       {/* dynamic 4-column dashboard layout */}
-      <section className="relative z-30 flex-1 w-full flex justify-center pb-12">
+      <section className="relative z-30 flex-1 w-full flex justify-center pb-16">
         <DashboardGrid
           store={store}
           onOpenAddWidget={handleOpenAddWidget}
         />
       </section>
+
+      {/* subtle grayish archivewalls button anchored low on the bottom viewport */}
+      <div className="fixed bottom-4 left-6 z-30">
+        <button
+          type="button"
+          className="px-2.5 py-1 rounded-md bg-black/40 hover:bg-black/60 border border-white/5 hover:border-white/10 text-[11px] text-white/40 hover:text-white/70 transition-colors"
+        >
+          ArchiveWalls
+        </button>
+      </div>
 
       {/* 3-pane widget selector modal */}
       <WidgetSelectorModal
