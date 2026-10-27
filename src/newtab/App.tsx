@@ -1,29 +1,25 @@
 import React, { useState } from 'react';
-import { WallpaperBackground } from './components/WallpaperBackground';
+import { RockBackground } from './components/rock-sequence';
 import { ClockWidget } from './components/ClockWidget';
-import { DEFAULT_WALLPAPERS, DEFAULT_SETTINGS } from '@/shared/constants';
-import type { Wallpaper, NewTabSettings } from '@/shared/types';
+import { DEFAULT_SETTINGS } from '@/shared/constants';
+import type { NewTabSettings } from '@/shared/types';
 
-// main new tab dashboard orchestrating wallpaper and widgets
+// main new tab dashboard orchestrating 3d rock sequence and widgets
 export const App: React.FC = () => {
   const [settings] = useState<NewTabSettings>(DEFAULT_SETTINGS);
-  const [wallpapers] = useState<Wallpaper[]>(DEFAULT_WALLPAPERS);
-
-  const activeWallpaper =
-    wallpapers.find((w) => w.id === settings.activeWallpaperId) || wallpapers[0] || null;
 
   return (
     <main className="relative w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
-      {/* background live wallpaper layer */}
-      <WallpaperBackground wallpaper={activeWallpaper} />
+      {/* 3d rock sequence live background */}
+      <RockBackground />
 
       {/* centered widgets container */}
-      <div className="relative z-10 flex flex-col items-center justify-center p-6">
+      <div className="relative z-20 flex flex-col items-center justify-center p-6 pointer-events-auto">
         {settings.showClock && <ClockWidget format={settings.clockFormat} />}
       </div>
 
-      {/* minimal bottom brand pill */}
-      <div className="absolute bottom-6 left-6 z-10 flex items-center space-x-2 text-xs text-white/40 tracking-wider font-light">
+      {/* minimal bottom brand watermark */}
+      <div className="absolute bottom-6 left-6 z-20 flex items-center space-x-2 text-xs text-white/40 tracking-wider font-light pointer-events-none">
         <span>ARCHIVE WALLS</span>
         <span>•</span>
         <span className="text-white/20">COLORWALL ECOSYSTEM</span>
