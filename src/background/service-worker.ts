@@ -2,20 +2,26 @@
 
 const NEW_TAB_URL = chrome.runtime.getURL('src/newtab/index.html');
 
+// helper to check if a url is targeting the default new tab
+const isDefaultNewTab = (url?: string): boolean => {
+  if (!url) return false;
+  return url.startsWith('chrome://newtab') || url === 'about:blank';
+};
+
 // intercept new tab creation and redirect to extension dashboard
 chrome.tabs.onCreated.addListener((tab) => {
-  if (tab.pendingUrl === 'chrome://newtab/' || tab.url === 'chrome://newtab/') {
-    if (tab.id !== undefined) {
-      chrome.tabs.update(tab.id, {
-        url: NEW_TAB_URL,
-      });
-    }
+  const targetUrl = tab.pendingUrl || tab.url;
+  if (isDefaultNewTab(targetUrl) && tab.id !== undefined) {
+    chrome.tabs.update(tab.id, {
+      url: NEW_TAB_URL,
+    });
   }
 });
 
-// also intercept url changes in case of lazy tab navigation
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (changeInfo.url === 'chrome://newtab/') {
+// also intercept url changes when tab finishes initializing
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  const targetUrl = changeInfo.url || tab.pendingUrl || tab.url;
+  if (isDefaultNewTab(targetUrl)) {
     chrome.tabs.update(tabId, {
       url: NEW_TAB_URL,
     });
