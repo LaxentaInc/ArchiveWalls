@@ -25,7 +25,7 @@ function getDomain(rawUrl: string): string {
   }
 }
 
-// scalable bookmarks group widget allowing custom bookmark addition and deletion
+// scalable bookmarks group widget with vscode cool dark matte styling
 export const BookmarksWidget: React.FC<BookmarksWidgetProps> = ({ data, onUpdate }) => {
   const items = data.items || DEFAULT_STARTER_BOOKMARKS;
 
@@ -64,8 +64,8 @@ export const BookmarksWidget: React.FC<BookmarksWidgetProps> = ({ data, onUpdate
 
   return (
     <div className="w-full flex flex-col space-y-3 select-none">
-      {/* bookmarks grid with generous touch targets and clean typography */}
-      <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+      {/* bookmarks grid with responsive column packing and vscode cool dark tiles */}
+      <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2.5">
         {items.map((item) => {
           const domain = getDomain(item.url);
           const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
@@ -80,12 +80,12 @@ export const BookmarksWidget: React.FC<BookmarksWidgetProps> = ({ data, onUpdate
                 title={`${item.title} (${item.url})`}
                 className="flex flex-col items-center w-full focus:outline-none"
               >
-                {/* rounded icon square */}
-                <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-black/40 group-hover:bg-white/10 transition-colors p-2 border border-white/10 group-hover:border-white/20">
+                {/* vscode cool dark tile */}
+                <div className="w-11 h-11 flex items-center justify-center rounded-lg bg-[#252526] group-hover:bg-[#2d2d2d] transition-colors p-2 border border-[#333333]">
                   <img
                     src={faviconUrl}
                     alt={item.title}
-                    className="w-6 h-6 object-contain pointer-events-none rounded"
+                    className="w-5 h-5 object-contain pointer-events-none rounded"
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = 'none';
                     }}
@@ -93,7 +93,7 @@ export const BookmarksWidget: React.FC<BookmarksWidgetProps> = ({ data, onUpdate
                 </div>
 
                 {/* bookmark label */}
-                <span className="text-xs text-white/70 group-hover:text-white transition-colors truncate max-w-[64px] text-center mt-1.5 font-normal">
+                <span className="text-[11px] text-[#cccccc] group-hover:text-white transition-colors truncate max-w-[62px] text-center mt-1.5 font-normal">
                   {item.title}
                 </span>
               </a>
@@ -102,7 +102,7 @@ export const BookmarksWidget: React.FC<BookmarksWidgetProps> = ({ data, onUpdate
               <button
                 type="button"
                 onClick={(e) => handleRemoveBookmark(item.id, e)}
-                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#e51400] hover:bg-[#c71200] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 title="Remove shortcut"
               >
                 <X className="w-2.5 h-2.5" />
@@ -118,55 +118,55 @@ export const BookmarksWidget: React.FC<BookmarksWidgetProps> = ({ data, onUpdate
           className="flex flex-col items-center w-full group focus:outline-none"
           title="Add new bookmark"
         >
-          <div className="w-12 h-12 flex items-center justify-center rounded-xl border border-dashed border-white/20 group-hover:border-white/40 group-hover:bg-white/5 transition-all">
-            <Plus className="w-5 h-5 text-white/40 group-hover:text-white/80 transition-colors" />
+          <div className="w-11 h-11 flex items-center justify-center rounded-lg border border-dashed border-[#3c3c3c] group-hover:border-[#007acc] bg-[#202020] group-hover:bg-[#252526] transition-colors">
+            <Plus className="w-4 h-4 text-[#858585] group-hover:text-[#007acc] transition-colors" />
           </div>
-          <span className="text-xs text-white/40 group-hover:text-white/70 transition-colors mt-1.5">
+          <span className="text-[11px] text-[#858585] group-hover:text-[#cccccc] transition-colors mt-1.5">
             Add
           </span>
         </button>
       </div>
 
-      {/* inline add bookmark modal/form */}
+      {/* inline add bookmark modal form in vscode cool dark */}
       {isAdding && (
         <form
           onSubmit={handleAddBookmark}
-          className="mt-2 p-3 bg-black/40 border border-white/10 rounded-xl space-y-2.5"
+          className="mt-2 p-3 bg-[#252526] border border-[#3c3c3c] rounded-lg space-y-2.5 shadow-xl"
         >
-          <div className="flex items-center justify-between pb-1 border-b border-white/5">
-            <span className="text-xs font-semibold text-white/80 flex items-center space-x-1.5">
-              <Globe className="w-3.5 h-3.5 text-blue-400" />
+          <div className="flex items-center justify-between pb-1 border-b border-[#333333]">
+            <span className="text-xs font-semibold text-[#cccccc] flex items-center space-x-1.5">
+              <Globe className="w-3.5 h-3.5 text-[#007acc]" />
               <span>Add Shortcut</span>
             </span>
             <button
               type="button"
               onClick={() => setIsAdding(false)}
-              className="text-white/40 hover:text-white"
+              className="text-[#858585] hover:text-[#cccccc]"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <div>
-            <label className="block text-[10px] text-white/50 mb-1">Title</label>
+            <label className="block text-[10px] text-[#858585] mb-1">Title</label>
             <input
               type="text"
               value={titleInput}
               onChange={(e) => setTitleInput(e.target.value)}
               placeholder="e.g. GitHub"
               autoFocus
-              className="w-full bg-black/60 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-white/30"
+              className="w-full bg-[#1e1e1e] border border-[#3c3c3c] rounded px-2.5 py-1.5 text-xs text-[#cccccc] placeholder-[#666666] outline-none focus:border-[#007acc]"
             />
           </div>
 
           <div>
-            <label className="block text-[10px] text-white/50 mb-1">URL</label>
+            <label className="block text-[10px] text-[#858585] mb-1">URL</label>
             <input
               type="text"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               placeholder="e.g. github.com"
-              className="w-full bg-black/60 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-white/30"
+              className="w-full bg-[#1e1e1e] border border-[#3c3c3c] rounded px-2.5 py-1.5 text-xs text-[#cccccc] placeholder-[#666666] outline-none focus:border-[#007acc]"
             />
           </div>
 
@@ -174,13 +174,13 @@ export const BookmarksWidget: React.FC<BookmarksWidgetProps> = ({ data, onUpdate
             <button
               type="button"
               onClick={() => setIsAdding(false)}
-              className="px-2.5 py-1 text-xs text-white/50 hover:text-white transition-colors"
+              className="px-2.5 py-1 text-xs text-[#858585] hover:text-[#cccccc] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-3 py-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg text-xs font-medium transition-colors"
+              className="px-3 py-1 bg-[#007acc] hover:bg-[#0062a3] text-white rounded text-xs font-medium transition-colors"
             >
               Add Shortcut
             </button>

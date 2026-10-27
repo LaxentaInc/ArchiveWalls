@@ -28,7 +28,7 @@ export const WIDGET_CATALOG: WidgetCatalogEntry[] = [
     defaultTitle: 'S&P 500 Market',
     defaultData: {
       url: TRADINGVIEW_DEFAULT_URL,
-      height: 260,
+      height: 380,
     },
   },
   {

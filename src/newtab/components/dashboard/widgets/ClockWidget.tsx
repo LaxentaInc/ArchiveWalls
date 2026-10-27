@@ -6,7 +6,7 @@ interface ClockWidgetProps {
   onUpdate: (data: Partial<ClockData>) => void;
 }
 
-// clean digital clock widget with customizable 12/24 hour display
+// clean digital clock widget with customizable 12/24 hour display in solid matte dark
 export const ClockWidget: React.FC<ClockWidgetProps> = ({ data, onUpdate }) => {
   const is24Hour = data.format === '24h';
   const showSeconds = data.showSeconds ?? false;
@@ -50,16 +50,16 @@ export const ClockWidget: React.FC<ClockWidgetProps> = ({ data, onUpdate }) => {
   });
 
   return (
-    <div className="w-full flex flex-col items-center justify-center py-2 select-none text-center">
+    <div className="w-full flex flex-col items-center justify-center py-2 select-none text-center text-white">
       <div
         onClick={toggleFormat}
-        className="text-4xl font-light tracking-tight text-white cursor-pointer hover:text-blue-300 transition-colors"
+        className="text-4xl font-light tracking-tight text-white cursor-pointer hover:text-blue-400 transition-colors"
         title="Click to toggle 12h / 24h format"
       >
         {formattedTime}
       </div>
 
-      <div className="text-xs text-white/50 mt-1 font-normal tracking-wide">
+      <div className="text-xs text-white/50 mt-1 font-medium tracking-wide">
         {formattedDate}
       </div>
 

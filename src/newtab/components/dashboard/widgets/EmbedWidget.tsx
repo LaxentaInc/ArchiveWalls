@@ -1,133 +1,150 @@
-import React, { useState } from 'react';
-import { Settings, ExternalLink, Check, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings, ExternalLink, Check, RotateCcw, X } from 'lucide-react';
 import type { EmbedData } from '../types';
 
+// tradingview interactive live chart url strictly locked to light theme ignoring os prefers-color-scheme
 export const TRADINGVIEW_DEFAULT_URL =
-  'https://s.tradingview.com/widgetembed/?frameElementId=tradingview_931a4&symbol=OANDA%3ASPX500USD&interval=5&hidesidetoolbar=0&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&hideideas=1&theme=White&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en';
+  'https://s.tradingview.com/widgetembed/?frameElementId=tradingview_931a4&symbol=OANDA%3ASPX500USD&interval=5&hidesidetoolbar=0&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&hideideas=1&theme=light&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%22paneProperties.background%22%3A%22%23ffffff%22%2C%22paneProperties.backgroundType%22%3A%22solid%22%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en';
+
+// normalizes tradingview urls to force theme=light and override system dark mode
+function ensureLightTheme(rawUrl: string): string {
+  if (!rawUrl.includes('tradingview.com')) return rawUrl;
+  let normalized = rawUrl
+    .replace('theme=White', 'theme=light')
+    .replace('theme=dark', 'theme=light');
+
+  if (normalized.includes('overrides=%7B%7D')) {
+    normalized = normalized.replace(
+      'overrides=%7B%7D',
+      'overrides=%7B%22paneProperties.background%22%3A%22%23ffffff%22%2C%22paneProperties.backgroundType%22%3A%22solid%22%7D'
+    );
+  }
+  return normalized;
+}
 
 interface EmbedWidgetProps {
   data: Partial<EmbedData>;
   onUpdate: (data: Partial<EmbedData>) => void;
+  height?: number;
 }
 
-// scalable embed widget rendering genuine tradingview financial charts or custom iframes
-export const EmbedWidget: React.FC<EmbedWidgetProps> = ({ data, onUpdate }) => {
-  const currentUrl = data.url || TRADINGVIEW_DEFAULT_URL;
-  const currentHeight = data.height || 260;
+// edge to edge light mode financial chart in dark matte chrome
+export const EmbedWidget: React.FC<EmbedWidgetProps> = ({ data, onUpdate, height }) => {
+  const currentUrl = ensureLightTheme(data.url || TRADINGVIEW_DEFAULT_URL);
+  const currentHeight = height || data.height || 380;
 
   const [isEditing, setIsEditing] = useState(false);
   const [urlInput, setUrlInput] = useState(currentUrl);
-  const [heightInput, setHeightInput] = useState(currentHeight);
 
-  // saves user custom embed url or dimension adjustments
+  // automatically upgrades stored local storage url to forced light theme
+  useEffect(() => {
+    if (data.url && (data.url.includes('theme=White') || data.url.includes('theme=dark') || data.url.includes('overrides=%7B%7D'))) {
+      onUpdate({
+        url: ensureLightTheme(data.url),
+      });
+    }
+  }, [data.url, onUpdate]);
+
+  // saves user custom embed url
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     onUpdate({
-      url: urlInput.trim() || TRADINGVIEW_DEFAULT_URL,
-      height: Math.max(160, Math.min(600, heightInput)),
+      url: ensureLightTheme(urlInput.trim() || TRADINGVIEW_DEFAULT_URL),
     });
     setIsEditing(false);
   };
 
-  // resets back to default genuine tradingview live chart
+  // resets back to default forced-light tradingview live chart
   const handleResetToTradingView = () => {
     setUrlInput(TRADINGVIEW_DEFAULT_URL);
-    setHeightInput(260);
     onUpdate({
       url: TRADINGVIEW_DEFAULT_URL,
-      height: 260,
     });
     setIsEditing(false);
   };
 
   return (
-    <div className="w-full flex flex-col space-y-2 select-none">
-      {/* action header for embed settings */}
-      <div className="flex items-center justify-between text-[11px] text-white/40 pb-1">
-        <span className="truncate max-w-[200px]">
-          {currentUrl.includes('tradingview.com') ? 'TradingView S&P 500' : 'Web Embed'}
-        </span>
-
-        <div className="flex items-center space-x-1.5">
-          <button
-            type="button"
-            onClick={() => setIsEditing(!isEditing)}
-            className="p-1 hover:text-white transition-colors"
-            title="Configure embed URL"
-          >
-            <Settings className="w-3.5 h-3.5" />
-          </button>
-          <a
-            href={currentUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1 hover:text-white transition-colors"
-            title="Open in new tab"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
+    <div className="relative w-full h-full select-none flex flex-col group/embed bg-[#ffffff]">
+      {/* subtle floating quick actions visible on hover */}
+      <div className="absolute top-2 right-2 z-20 flex items-center space-x-1 opacity-0 group-hover/embed:opacity-100 transition-opacity">
+        <button
+          type="button"
+          onClick={() => setIsEditing(!isEditing)}
+          className="p-1 rounded bg-black/60 hover:bg-black/80 text-white/70 hover:text-white transition-colors"
+          title="Configure URL"
+        >
+          <Settings className="w-3.5 h-3.5" />
+        </button>
+        <a
+          href={currentUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-1 rounded bg-black/60 hover:bg-black/80 text-white/70 hover:text-white transition-colors"
+          title="Open in new tab"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
       </div>
 
-      {/* embed configuration form */}
+      {/* embed configuration popover overlay in vscode cool dark */}
       {isEditing && (
-        <form onSubmit={handleSave} className="bg-black/30 border border-white/10 rounded-lg p-3 space-y-2.5 mb-2">
+        <form
+          onSubmit={handleSave}
+          className="absolute inset-x-2 top-2 z-30 bg-[#252526] border border-[#3c3c3c] rounded-lg p-3 space-y-2 shadow-2xl text-[#cccccc]"
+        >
+          <div className="flex items-center justify-between pb-1 border-b border-[#333333]">
+            <span className="text-xs font-semibold text-[#cccccc]">Embed Settings</span>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="text-[#858585] hover:text-[#cccccc]"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           <div>
-            <label className="block text-[10px] text-white/50 mb-1">Embed URL / Iframe source</label>
+            <label className="block text-[10px] text-[#858585] mb-1">Iframe Source URL</label>
             <input
               type="text"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               placeholder="https://..."
-              className="w-full bg-black/50 border border-white/10 rounded px-2.5 py-1 text-xs text-white outline-none focus:border-white/30"
+              className="w-full bg-[#1e1e1e] border border-[#3c3c3c] rounded px-2.5 py-1 text-xs text-[#cccccc] placeholder-[#666666] outline-none focus:border-[#007acc]"
             />
           </div>
 
-          <div className="flex items-center space-x-2">
-            <div className="flex-1">
-              <label className="block text-[10px] text-white/50 mb-1">Height (px)</label>
-              <input
-                type="number"
-                value={heightInput}
-                onChange={(e) => setHeightInput(Number(e.target.value))}
-                min={160}
-                max={600}
-                className="w-full bg-black/50 border border-white/10 rounded px-2.5 py-1 text-xs text-white outline-none focus:border-white/30"
-              />
-            </div>
+          <div className="flex items-center justify-between pt-1">
+            <button
+              type="button"
+              onClick={handleResetToTradingView}
+              className="px-2 py-1 bg-[#1e1e1e] hover:bg-[#2d2d2d] text-[#858585] hover:text-[#cccccc] border border-[#333333] rounded text-[11px] transition-colors flex items-center space-x-1"
+              title="Reset to TradingView S&P 500"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset TradingView</span>
+            </button>
 
-            <div className="flex items-end space-x-1.5 pt-3">
-              <button
-                type="button"
-                onClick={handleResetToTradingView}
-                className="px-2 py-1 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white rounded text-xs transition-colors flex items-center space-x-1"
-                title="Reset to TradingView"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>TradingView</span>
-              </button>
-
-              <button
-                type="submit"
-                className="px-3 py-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded text-xs font-medium transition-colors flex items-center space-x-1"
-              >
-                <Check className="w-3 h-3" />
-                <span>Save</span>
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="px-3 py-1 bg-[#007acc] hover:bg-[#0062a3] text-white rounded text-xs font-medium transition-colors flex items-center space-x-1"
+            >
+              <Check className="w-3 h-3" />
+              <span>Save</span>
+            </button>
           </div>
         </form>
       )}
 
-      {/* responsive iframe embed container */}
+      {/* edge-to-edge forced pure white iframe container */}
       <div
-        className="w-full rounded-lg overflow-hidden border border-white/10 bg-black/40"
+        className="w-full h-full rounded-b-xl overflow-hidden bg-[#ffffff]"
         style={{ height: `${currentHeight}px` }}
       >
         <iframe
           src={currentUrl}
-          title="Embed View"
-          className="w-full h-full border-0"
+          title="Market Chart"
+          className="w-full h-full border-0 block bg-white"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           sandbox="allow-scripts allow-same-origin allow-popups allow-forms"

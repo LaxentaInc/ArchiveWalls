@@ -6,7 +6,7 @@ interface NotesWidgetProps {
   onUpdate: (data: Partial<NotesData>) => void;
 }
 
-// clean notes widget providing instant scratchpad persistence
+// vscode cool dark matte scratchpad notes widget providing instant local persistence
 export const NotesWidget: React.FC<NotesWidgetProps> = ({ data, onUpdate }) => {
   const [content, setContent] = useState(data.content || '');
 
@@ -24,9 +24,9 @@ export const NotesWidget: React.FC<NotesWidgetProps> = ({ data, onUpdate }) => {
         onChange={handleChange}
         placeholder="Type quick notes, ideas, or reminders here..."
         rows={5}
-        className="w-full bg-black/30 hover:bg-black/40 focus:bg-black/50 border border-white/10 focus:border-white/20 rounded-lg p-3 text-xs text-white/90 placeholder-white/25 outline-none resize-none transition-colors leading-relaxed"
+        className="w-full bg-[#1e1e1e] hover:bg-[#252526] focus:bg-[#252526] border border-[#333333] focus:border-[#007acc] rounded-lg p-3 text-xs text-[#cccccc] placeholder-[#666666] outline-none resize-none transition-colors leading-relaxed"
       />
-      <div className="flex justify-between items-center text-[10px] text-white/30 pt-1">
+      <div className="flex justify-between items-center text-[10px] text-[#858585] pt-1">
         <span>{content.length} characters</span>
         <span>Auto-saved</span>
       </div>

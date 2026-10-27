@@ -1,5 +1,6 @@
 // barrel export for modular dashboard architecture
 export * from './types';
+export * from './widgetConstraints';
 export * from './useWidgetStore';
 export * from './WidgetCatalog';
 export * from './WidgetWrapper';

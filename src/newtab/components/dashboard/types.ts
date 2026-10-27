@@ -81,6 +81,9 @@ export interface WidgetConfig {
   title: string;
   column: number;
   order: number;
+  colSpan?: number;
+  width?: number;
+  height?: number;
   // widget-specific configuration payload
   data: Record<string, unknown>;
 }

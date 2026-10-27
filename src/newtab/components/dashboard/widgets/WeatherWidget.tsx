@@ -33,7 +33,7 @@ function renderWeatherIcon(code: number, className = 'w-4 h-4') {
   return <Cloud className={`${className} text-white/70`} />;
 }
 
-// privacy-respecting weather widget relying on manual city selection
+// privacy-respecting solid matte dark weather widget relying on manual city selection
 export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ data, onUpdate }) => {
   const currentCity = data.city || 'Tokyo';
   const currentLat = data.lat ?? 35.6762;
@@ -139,23 +139,23 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ data, onUpdate }) 
   };
 
   return (
-    <div className="w-full flex flex-col space-y-3 select-none">
+    <div className="w-full flex flex-col space-y-3 select-none text-[#cccccc]">
       {/* city header and change location trigger */}
       <div className="flex items-center justify-between text-xs">
         <button
           type="button"
           onClick={() => setIsSearching(!isSearching)}
-          className="flex items-center space-x-1.5 text-white/70 hover:text-white transition-colors"
+          className="flex items-center space-x-1.5 text-[#cccccc] hover:text-white transition-colors"
           title="Click to change city"
         >
-          <MapPin className="w-3.5 h-3.5 text-white/60" />
-          <span className="font-medium truncate max-w-[170px]">{weather.city}</span>
+          <MapPin className="w-3.5 h-3.5 text-[#007acc]" />
+          <span className="font-semibold truncate max-w-[170px]">{weather.city}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setIsSearching(!isSearching)}
-          className="text-[11px] text-white/40 hover:text-white transition-colors"
+          className="text-[11px] text-[#858585] hover:text-[#cccccc] transition-colors"
         >
           {isSearching ? 'Cancel' : 'Change City'}
         </button>
@@ -171,11 +171,11 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ data, onUpdate }) 
               onChange={(e) => setCityInput(e.target.value)}
               placeholder="Enter city (e.g. London, Paris, Tokyo)..."
               autoFocus
-              className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-white/30"
+              className="flex-1 bg-[#1e1e1e] border border-[#3c3c3c] rounded px-3 py-1.5 text-xs text-[#cccccc] placeholder-[#666666] outline-none focus:border-[#007acc]"
             />
             <button
               type="submit"
-              className="p-2 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg transition-colors"
+              className="p-2 bg-[#007acc] hover:bg-[#0062a3] text-white rounded transition-colors"
               title="Search"
             >
               <Search className="w-3.5 h-3.5" />
@@ -193,26 +193,26 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ data, onUpdate }) 
             <div className="text-3xl font-light text-white leading-none">
               {weather.temperature}°C
             </div>
-            <div className="text-xs text-white/60 mt-1 font-normal">{weather.condition}</div>
+            <div className="text-xs text-[#858585] mt-1 font-medium">{weather.condition}</div>
           </div>
         </div>
 
-        <div className="text-right text-[11px] text-white/50 space-y-0.5 font-light">
+        <div className="text-right text-[11px] text-[#858585] space-y-0.5 font-normal">
           <div>Feels like {weather.feelsLike}°C</div>
           <div>Wind: {weather.windSpeed} km/h</div>
           <div>Humidity: {weather.humidity}%</div>
         </div>
       </div>
 
-      {/* 5-day daily forecast strip */}
+      {/* 5-day daily forecast strip without divider lines */}
       {weather.daily.length > 0 && (
-        <div className="grid grid-cols-5 gap-1.5 pt-3 mt-1 border-t border-white/5 text-center">
+        <div className="grid grid-cols-5 gap-1.5 pt-2 text-center">
           {weather.daily.map((day, idx) => (
-            <div key={idx} className="flex flex-col items-center space-y-1 py-1">
-              <span className="text-[11px] text-white/50 font-medium">{day.day}</span>
+            <div key={idx} className="flex flex-col items-center space-y-1 py-1 rounded bg-[#252526]/40">
+              <span className="text-[11px] text-[#858585] font-medium">{day.day}</span>
               <div className="my-0.5">{renderWeatherIcon(day.weatherCode, 'w-4 h-4')}</div>
-              <span className="text-[11px] text-white/80 font-light">
-                {day.maxTemp}° <span className="text-white/35 text-[10px]">{day.minTemp}°</span>
+              <span className="text-[11px] text-[#cccccc] font-medium">
+                {day.maxTemp}° <span className="text-[#666666] text-[10px]">{day.minTemp}°</span>
               </span>
             </div>
           ))}

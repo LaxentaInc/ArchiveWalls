@@ -12,8 +12,9 @@ interface WidgetRendererProps {
   onRemove: (id: string) => void;
   onUpdate: (id: string, data: Record<string, unknown>) => void;
   onUpdateTitle: (id: string, title: string) => void;
-  onMoveColumn?: (id: string, newColumn: number) => void;
-  totalColumns?: number;
+  onUpdateColSpan?: (id: string, colSpan: number) => void;
+  onStartDrag?: (e: React.PointerEvent<HTMLDivElement>, widget: WidgetConfig, el: HTMLElement) => void;
+  isDraggingThis?: boolean;
 }
 
 // polymorphic widget renderer mapping widget type enum to concrete widget components
@@ -22,8 +23,9 @@ export const WidgetRenderer: React.FC<WidgetRendererProps> = ({
   onRemove,
   onUpdate,
   onUpdateTitle,
-  onMoveColumn,
-  totalColumns = 4,
+  onUpdateColSpan,
+  onStartDrag,
+  isDraggingThis = false,
 }) => {
   // renders concrete widget body based on widget.type
   const renderBody = () => {
@@ -40,6 +42,7 @@ export const WidgetRenderer: React.FC<WidgetRendererProps> = ({
           <EmbedWidget
             data={widget.data}
             onUpdate={(data) => onUpdate(widget.id, data)}
+            height={widget.height}
           />
         );
       case 'weather':
@@ -65,7 +68,7 @@ export const WidgetRenderer: React.FC<WidgetRendererProps> = ({
         );
       default:
         return (
-          <div className="text-xs text-white/40 p-3">
+          <div className="text-xs text-gray-500 p-3">
             Unknown widget type: {widget.type}
           </div>
         );
@@ -77,8 +80,9 @@ export const WidgetRenderer: React.FC<WidgetRendererProps> = ({
       widget={widget}
       onRemove={onRemove}
       onUpdateTitle={onUpdateTitle}
-      onMoveColumn={onMoveColumn}
-      totalColumns={totalColumns}
+      onUpdateColSpan={onUpdateColSpan}
+      onStartDrag={onStartDrag}
+      isDraggingThis={isDraggingThis}
     >
       {renderBody()}
     </WidgetWrapper>

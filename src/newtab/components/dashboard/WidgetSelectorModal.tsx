@@ -83,12 +83,11 @@ function renderStartMeIcon(iconName: string) {
   }
 }
 
-// clean startme-style widget catalog modal with flat gray styling and zero blurs
 export const WidgetSelectorModal: React.FC<WidgetSelectorModalProps> = ({
   isOpen,
   onClose,
   onAddWidget,
-  totalColumns = 4,
+  // totalColumns = 4,
   defaultTargetColumn = 0,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<WidgetCategory>('all');
@@ -152,27 +151,27 @@ export const WidgetSelectorModal: React.FC<WidgetSelectorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 select-none">
-      {/* modal box strictly constrained to prevent any horizontal scrollbar overflow */}
-      <div className="relative w-full max-w-5xl h-[82vh] max-h-[700px] bg-[#1a1d24] border border-[#2c3240] rounded-xl flex flex-col overflow-hidden text-white">
+      {/* modal box strictly constrained in vscode cool dark */}
+      <div className="relative w-full max-w-5xl h-[82vh] max-h-[700px] bg-[#1e1e1e] border border-[#2d2d2d] rounded-xl flex flex-col overflow-hidden text-[#cccccc] shadow-2xl">
         
-        {/* clean top header: title on left, search bar in the center, close on right */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-[#292e3a] bg-[#16181f] shrink-0">
+        {/* clean top header in vscode #181818 */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#2d2d2d] bg-[#181818] shrink-0">
           <div className="w-52 shrink-0">
             <h2 className="text-base font-semibold text-white tracking-normal">
               Add widget
             </h2>
           </div>
 
-          {/* search bar placed directly in the header */}
+          {/* search bar in vscode input styling */}
           <div className="flex-1 max-w-md mx-4">
             <div className="relative w-full">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-white/40" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#858585]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search widgets and feeds, or paste a URL"
-                className="w-full bg-[#202530] border border-[#2e3545] rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-white/40 outline-none focus:border-[#424c61] transition-colors"
+                className="w-full bg-[#252526] border border-[#3c3c3c] rounded px-3 pl-8 py-1.5 text-xs text-[#cccccc] placeholder-[#666666] outline-none focus:border-[#007acc] transition-colors"
               />
             </div>
           </div>
@@ -180,7 +179,7 @@ export const WidgetSelectorModal: React.FC<WidgetSelectorModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-white/40 hover:text-white rounded-lg hover:bg-white/5 transition-colors shrink-0"
+            className="p-1.5 text-[#858585] hover:text-[#cccccc] rounded hover:bg-white/5 transition-colors shrink-0"
             title="Close (Esc)"
           >
             <X className="w-4 h-4" />
@@ -190,7 +189,7 @@ export const WidgetSelectorModal: React.FC<WidgetSelectorModalProps> = ({
         {/* 3-column body layout strictly overflow-x hidden */}
         <div className="flex-1 flex overflow-hidden min-h-0">
           {/* left column: categories sidebar */}
-          <div className="w-52 border-r border-[#292e3a] p-3 flex flex-col space-y-1 bg-[#16181f] shrink-0 overflow-y-auto">
+          <div className="w-52 border-r border-[#2d2d2d] p-3 flex flex-col space-y-1 bg-[#181818] shrink-0 overflow-y-auto">
             {CATEGORIES.map((cat) => {
               const count =
                 cat.id === 'all'
@@ -206,15 +205,15 @@ export const WidgetSelectorModal: React.FC<WidgetSelectorModalProps> = ({
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
                     isActive
-                      ? 'bg-[#282d39] text-white font-medium'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                      ? 'bg-[#2a2d2e] text-[#007acc] font-medium'
+                      : 'text-[#858585] hover:text-[#cccccc] hover:bg-white/5'
                   }`}
                 >
                   <div className="flex items-center space-x-2.5">
                     {cat.icon}
                     <span>{cat.label}</span>
                   </div>
-                  <span className="text-[11px] text-white/40">
+                  <span className="text-[11px] text-[#666666]">
                     {count}
                   </span>
                 </button>
@@ -223,9 +222,9 @@ export const WidgetSelectorModal: React.FC<WidgetSelectorModalProps> = ({
           </div>
 
           {/* middle column: widget selection list */}
-          <div className="w-84 sm:w-92 border-r border-[#292e3a] flex flex-col bg-[#1c2029] shrink-0 overflow-y-auto p-3 space-y-2">
+          <div className="w-84 sm:w-92 border-r border-[#2d2d2d] flex flex-col bg-[#252526] shrink-0 overflow-y-auto p-3 space-y-2">
             {filteredWidgets.length === 0 ? (
-              <div className="text-center py-10 text-xs text-white/30">
+              <div className="text-center py-10 text-xs text-[#858585]">
                 No widgets found matching your query.
               </div>
             ) : (
@@ -236,19 +235,19 @@ export const WidgetSelectorModal: React.FC<WidgetSelectorModalProps> = ({
                   <div
                     key={item.name}
                     onClick={() => setSelectedWidget(item)}
-                    className={`p-3 rounded-xl cursor-pointer transition-colors ${
+                    className={`p-3 rounded-lg cursor-pointer transition-colors border ${
                       isSelected
-                        ? 'bg-[#292f3d]'
-                        : 'bg-[#202531] hover:bg-[#252b38]'
+                        ? 'bg-[#2a2d2e] border-[#007acc]'
+                        : 'bg-[#1e1e1e] border-[#333333] hover:bg-[#252526]'
                     }`}
                   >
                     <div className="flex items-start space-x-3">
                       {renderStartMeIcon(item.iconName)}
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-semibold text-white tracking-normal truncate">
+                        <h4 className="text-xs font-semibold text-[#cccccc] tracking-normal truncate">
                           {item.name}
                         </h4>
-                        <p className="text-[11px] text-white/50 line-clamp-2 mt-0.5 leading-relaxed">
+                        <p className="text-[11px] text-[#858585] line-clamp-2 mt-0.5 leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -260,70 +259,48 @@ export const WidgetSelectorModal: React.FC<WidgetSelectorModalProps> = ({
           </div>
 
           {/* right column: preview & placement configuration */}
-          <div className="flex-1 flex flex-col bg-[#16181f] overflow-y-auto p-5 min-w-0">
+          <div className="flex-1 flex flex-col bg-[#1e1e1e] overflow-y-auto p-5 min-w-0">
             <div className="flex-1 flex flex-col">
               {/* preview header */}
-              <div className="pb-3 mb-3 border-b border-[#292e3a]">
+              <div className="pb-3 mb-3 border-b border-[#2d2d2d]">
                 <div className="flex items-center space-x-3">
                   {renderStartMeIcon(selectedWidget.iconName)}
                   <div>
                     <h3 className="text-sm font-semibold text-white">{selectedWidget.name}</h3>
-                    <p className="text-xs text-white/50 mt-0.5">{selectedWidget.description}</p>
+                    <p className="text-xs text-[#858585] mt-0.5">{selectedWidget.description}</p>
                   </div>
                 </div>
               </div>
 
               {/* visual preview box */}
               <div className="flex-1 flex flex-col">
-                <span className="text-[10px] uppercase font-semibold text-white/40 tracking-wider mb-2">
+                <span className="text-[10px] uppercase font-semibold text-[#858585] tracking-wider mb-2">
                   Live Preview
                 </span>
-                <div className="w-full bg-[#1c2029] border border-[#2c3240] rounded-xl p-4">
-                  <div className="text-xs font-semibold text-white/90 pb-2 mb-2 border-b border-[#292e3a]">
+                <div className="w-full bg-[#252526] border border-[#333333] rounded-xl p-4">
+                  <div className="text-xs font-semibold text-[#cccccc] pb-2 mb-2 border-b border-[#333333]">
                     {selectedWidget.defaultTitle}
                   </div>
                   {renderPreview(selectedWidget)}
                 </div>
               </div>
 
-              {/* placement target column selector and commit action */}
-              <div className="pt-4 mt-4 border-t border-[#292e3a] flex items-center justify-between gap-4 shrink-0">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs text-white/50">Target Column:</span>
-                  <div className="flex space-x-1">
-                    {Array.from({ length: totalColumns }).map((_, colIdx) => (
-                      <button
-                        key={colIdx}
-                        type="button"
-                        onClick={() => setTargetColumn(colIdx)}
-                        className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
-                          targetColumn === colIdx
-                            ? 'bg-[#3b82f6] text-white'
-                            : 'bg-[#222733] text-white/50 hover:bg-[#2b3140] hover:text-white'
-                        }`}
-                      >
-                        {colIdx + 1}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="px-3 py-1.5 text-xs text-white/50 hover:text-white rounded-lg transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAdd}
-                    className="px-4 py-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-medium rounded-lg transition-colors"
-                  >
-                    Add to Dashboard
-                  </button>
-                </div>
+              {/* commit action */}
+              <div className="pt-4 mt-4 border-t border-[#2d2d2d] flex items-center justify-end gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-3 py-1.5 text-xs text-[#858585] hover:text-[#cccccc] rounded transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAdd}
+                  className="px-4 py-1.5 bg-[#007acc] hover:bg-[#0062a3] text-white text-xs font-medium rounded transition-colors shadow-sm"
+                >
+                  Add to Workspace
+                </button>
               </div>
             </div>
           </div>
