@@ -8,6 +8,7 @@ import {
   type WidgetCatalogEntry,
 } from './components/dashboard';
 import {
+  BackgroundProvider,
   useBackgroundStore,
   BACKGROUND_PRESETS,
 } from './components/dashboard/useBackgroundStore';
@@ -199,11 +200,13 @@ const DashboardMain: React.FC = () => {
   );
 };
 
-// root app container wrapping dashboard with video download provider
+// root app container wrapping dashboard with video download provider and shared background provider
 export const App: React.FC = () => {
   return (
     <VideoDownloadProvider>
-      <DashboardMain />
+      <BackgroundProvider>
+        <DashboardMain />
+      </BackgroundProvider>
     </VideoDownloadProvider>
   );
 };

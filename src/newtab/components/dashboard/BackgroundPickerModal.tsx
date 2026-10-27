@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   X,
   Upload,
@@ -9,12 +9,21 @@ import {
   Sparkles,
   Trash2,
   Play,
+  ShoppingBag,
+  Search,
+  Loader2,
+  Download,
 } from 'lucide-react';
 import {
   BACKGROUND_PRESETS,
   type BackgroundConfig,
 } from './useBackgroundStore';
 import { useVideoDownload } from './VideoDownloadContext';
+import {
+  fetchStoreWallpapers,
+  STORE_CATEGORIES,
+  type StoreWallpaperItem,
+} from './wallpaperStore';
 
 interface BackgroundPickerModalProps {
   isOpen: boolean;
@@ -24,7 +33,7 @@ interface BackgroundPickerModalProps {
   onSetCustomImage: (dataUrl: string) => void;
 }
 
-// modal allowing user to switch backgrounds between curated presets, local uploads, or direct links
+// modal allowing user to switch backgrounds between curated presets, live store catalog, uploads, or links
 export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
   isOpen,
   onClose,
@@ -32,11 +41,18 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
   onSelectPreset,
   onSetCustomImage,
 }) => {
-  const [activeTab, setActiveTab] = useState<'presets' | 'saved' | 'upload' | 'url'>('presets');
+  const [activeTab, setActiveTab] = useState<'presets' | 'store' | 'saved' | 'upload' | 'url'>('presets');
   const [nameInput, setNameInput] = useState('');
   const [urlInput, setUrlInput] = useState('');
   const [isUrlVideo, setIsUrlVideo] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // live store catalog state with category filters and search
+  const [storeCategory, setStoreCategory] = useState<string>('all');
+  const [storeQuery, setStoreQuery] = useState<string>('');
+  const [storeItems, setStoreItems] = useState<StoreWallpaperItem[]>([]);
+  const [isLoadingStore, setIsLoadingStore] = useState(false);
+  const [installingStoreId, setInstallingStoreId] = useState<string | null>(null);
 
   const {
     savedVideos,
@@ -47,7 +63,40 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
     clearActiveVideo,
   } = useVideoDownload();
 
-  if (!isOpen) return null;
+  // fetches store catalog when modal is open and store tab is active
+  useEffect(() => {
+    if (!isOpen || activeTab !== 'store') return;
+
+    let isCurrent = true;
+    setIsLoadingStore(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        const items = await fetchStoreWallpapers(storeCategory, storeQuery);
+        if (isCurrent) {
+          setStoreItems(items);
+        }
+      } finally {
+        if (isCurrent) {
+          setIsLoadingStore(false);
+        }
+      }
+    }, 250);
+
+    return () => {
+      isCurrent = false;
+      clearTimeout(timer);
+    };
+  }, [activeTab, storeCategory, storeQuery]);
+
+  // downloads and applies selected wallpaper from the store catalog
+  const handleSelectStoreItem = async (item: StoreWallpaperItem) => {
+    setInstallingStoreId(item.id);
+    clearActiveVideo();
+    onClose();
+    await downloadAndSaveVideo(item.detailUrl, item.title);
+    setInstallingStoreId(null);
+  };
 
   // reads uploaded local image file as base64 data url for persistent local storage
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,6 +183,18 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab('store')}
+            className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'store'
+                ? 'border-[#007acc] text-white'
+                : 'border-transparent text-[#858585] hover:text-[#cccccc]'
+            }`}
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-[#38bdf8]" />
+            <span>Store</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('saved')}
             className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'saved'
@@ -215,6 +276,112 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* live wallpaper store catalog */}
+          {activeTab === 'store' && (
+            <div className="space-y-4">
+              {/* store search and category filter header */}
+              <div className="flex flex-col sm:flex-row gap-2.5 justify-between items-stretch sm:items-center">
+                <div className="relative flex-1">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#707070]" />
+                  <input
+                    type="text"
+                    value={storeQuery}
+                    onChange={(e) => setStoreQuery(e.target.value)}
+                    placeholder="Search live wallpapers (e.g. Ahri, Cyberpunk, Ghibli)..."
+                    className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-[#666666] outline-none focus:border-[#007acc]"
+                  />
+                  {storeQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setStoreQuery('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#858585] hover:text-white cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0">
+                  {STORE_CATEGORIES.map((cat) => {
+                    const isActive = storeCategory === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setStoreCategory(cat.id)}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer whitespace-nowrap ${
+                          isActive
+                            ? 'bg-[#007acc] text-white'
+                            : 'bg-[#202020] text-[#858585] hover:text-[#cccccc] hover:bg-[#282828]'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* catalog items grid or loading indicator */}
+              {isLoadingStore ? (
+                <div className="py-16 flex flex-col items-center justify-center space-y-2 text-center text-[#858585]">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#007acc]" />
+                  <span className="text-xs">Fetching live wallpapers...</span>
+                </div>
+              ) : storeItems.length === 0 ? (
+                <div className="text-center py-12 text-xs text-[#858585] border border-dashed border-[#2d2d2d] rounded-xl p-6">
+                  No wallpapers found matching &ldquo;{storeQuery}&rdquo;. Try another search term or category.
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {storeItems.map((item) => {
+                    const isInstalling = installingStoreId === item.id;
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => handleSelectStoreItem(item)}
+                        className="group relative rounded-xl overflow-hidden border border-[#2d2d2d] hover:border-[#007acc] cursor-pointer transition-all aspect-video flex flex-col justify-end p-2.5 bg-[#141414] shadow-md"
+                      >
+                        <img
+                          src={item.thumbnailUrl}
+                          alt={item.title}
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+                        {/* resolution badge */}
+                        <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-md text-[9px] text-[#38bdf8] font-mono border border-white/10">
+                          {item.resolution}
+                        </div>
+
+                        {/* title and quick apply action */}
+                        <div className="relative z-10 flex items-center justify-between">
+                          <span className="text-xs font-semibold text-white drop-shadow truncate mr-1.5">
+                            {item.title}
+                          </span>
+
+                          <button
+                            type="button"
+                            className="w-6 h-6 rounded-md bg-[#007acc] hover:bg-[#0062a3] text-white flex items-center justify-center shrink-0 shadow-lg cursor-pointer transition-transform group-hover:scale-110"
+                            title="Download and apply wallpaper"
+                          >
+                            {isInstalling ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Download className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 

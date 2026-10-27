@@ -7,6 +7,7 @@ import React, {
   useRef,
 } from 'react';
 import { saveVideoBlob, getVideoBlob, deleteVideoBlob } from './videoStorage';
+import { resolveStoreVideoUrl } from './wallpaperStore';
 
 export interface SavedVideoItem {
   id: string;
@@ -158,12 +159,33 @@ export const VideoDownloadProvider: React.FC<{ children: React.ReactNode }> = ({
       abortControllerRef.current = controller;
 
       try {
-        const response = await fetch(url, {
+        let streamUrl = url;
+        // if user entered a webpage detail link auto-resolve it to the direct video stream
+        if (
+          !url.endsWith('.mp4') &&
+          !url.endsWith('.webm') &&
+          !url.includes('download.php?video=')
+        ) {
+          setDownloadSpeed('Resolving stream...');
+          try {
+            streamUrl = await resolveStoreVideoUrl(url);
+          } catch {
+            streamUrl = url;
+          }
+        }
+
+        const response = await fetch(streamUrl, {
           signal: controller.signal,
         });
 
         if (!response.ok) {
           throw new Error(`Server returned HTTP ${response.status}`);
+        }
+
+        // prevent saving raw html webpages as video files
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('text/html')) {
+          throw new Error('This page does not link to a direct video file. Please use direct .mp4 or .webm links.');
         }
 
         const contentLengthHeader = response.headers.get('content-length');

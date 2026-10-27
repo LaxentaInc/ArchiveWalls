@@ -18,3 +18,4 @@ export * from './VideoDownloadContext';
 export * from './VideoDownloadHUD';
 export * from './useBackgroundStore';
 export * from './BackgroundPickerModal';
+export * from './wallpaperStore';

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 export type BackgroundType = 'preset' | 'rock' | 'custom_image' | 'custom_video';
 
@@ -74,8 +74,19 @@ function loadConfig(): BackgroundConfig {
   return getDefaultConfig();
 }
 
-// central state hook for dynamic wallpaper selection, custom uploads, and persistence
-export function useBackgroundStore() {
+interface BackgroundContextType {
+  config: BackgroundConfig;
+  selectPreset: (presetId: string) => void;
+  setCustomImage: (urlOrData: string) => void;
+  setCustomVideo: (videoUrl: string) => void;
+}
+
+const BackgroundContext = createContext<BackgroundContextType | null>(null);
+
+// shared background context provider eliminating isolated state between background view and picker
+export const BackgroundProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [config, setConfig] = useState<BackgroundConfig>(loadConfig);
 
   // syncs configuration changes to local storage
@@ -113,12 +124,27 @@ export function useBackgroundStore() {
     });
   }, []);
 
-  return {
-    config,
-    selectPreset,
-    setCustomImage,
-    setCustomVideo,
-  };
+  return (
+    <BackgroundContext.Provider
+      value={{
+        config,
+        selectPreset,
+        setCustomImage,
+        setCustomVideo,
+      }}
+    >
+      {children}
+    </BackgroundContext.Provider>
+  );
+};
+
+// custom hook to access unified background configuration across dashboard
+export function useBackgroundStore(): BackgroundContextType {
+  const context = useContext(BackgroundContext);
+  if (!context) {
+    throw new Error('useBackgroundStore must be used within a BackgroundProvider');
+  }
+  return context;
 }
 
 export default useBackgroundStore;
