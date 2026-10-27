@@ -7,11 +7,14 @@ import {
   Image as ImageIcon,
   Film,
   Sparkles,
+  Trash2,
+  Play,
 } from 'lucide-react';
 import {
   BACKGROUND_PRESETS,
   type BackgroundConfig,
 } from './useBackgroundStore';
+import { useVideoDownload } from './VideoDownloadContext';
 
 interface BackgroundPickerModalProps {
   isOpen: boolean;
@@ -19,7 +22,6 @@ interface BackgroundPickerModalProps {
   config: BackgroundConfig;
   onSelectPreset: (presetId: string) => void;
   onSetCustomImage: (dataUrl: string) => void;
-  onSetCustomVideo: (videoUrl: string) => void;
 }
 
 // modal allowing user to switch backgrounds between curated presets, local uploads, or direct links
@@ -29,12 +31,21 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
   config,
   onSelectPreset,
   onSetCustomImage,
-  onSetCustomVideo,
 }) => {
-  const [activeTab, setActiveTab] = useState<'presets' | 'upload' | 'url'>('presets');
+  const [activeTab, setActiveTab] = useState<'presets' | 'saved' | 'upload' | 'url'>('presets');
+  const [nameInput, setNameInput] = useState('');
   const [urlInput, setUrlInput] = useState('');
-  const [isUrlVideo, setIsUrlVideo] = useState(false);
+  const [isUrlVideo, setIsUrlVideo] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    savedVideos,
+    activeVideoId,
+    downloadAndSaveVideo,
+    selectSavedVideo,
+    removeSavedVideo,
+    clearActiveVideo,
+  } = useVideoDownload();
 
   if (!isOpen) return null;
 
@@ -46,6 +57,7 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === 'string') {
+        clearActiveVideo();
         onSetCustomImage(reader.result);
         onClose();
       }
@@ -53,18 +65,25 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
     reader.readAsDataURL(file);
   };
 
-  // applies custom direct link to image or video
-  const handleApplyUrl = (e: React.FormEvent) => {
+  // initiates video download or sets image url with user-specified name
+  const handleApplyUrl = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!urlInput.trim()) return;
 
-    if (isUrlVideo || urlInput.endsWith('.mp4') || urlInput.endsWith('.webm')) {
-      onSetCustomVideo(urlInput.trim());
+    const trimmedUrl = urlInput.trim();
+    const trimmedName = nameInput.trim() || 'Custom Wallpaper';
+
+    if (isUrlVideo || trimmedUrl.endsWith('.mp4') || trimmedUrl.endsWith('.webm')) {
+      onClose();
+      await downloadAndSaveVideo(trimmedUrl, trimmedName);
     } else {
-      onSetCustomImage(urlInput.trim());
+      clearActiveVideo();
+      onSetCustomImage(trimmedUrl);
+      onClose();
     }
+
     setUrlInput('');
-    onClose();
+    setNameInput('');
   };
 
   return (
@@ -79,18 +98,18 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 text-[#858585] hover:text-[#cccccc] transition-colors"
+            className="p-1 text-[#858585] hover:text-[#cccccc] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* tab navigation */}
-        <div className="flex border-b border-[#262626] bg-[#141414] px-5 space-x-4 text-xs">
+        <div className="flex border-b border-[#262626] bg-[#141414] px-5 space-x-4 text-xs overflow-x-auto">
           <button
             type="button"
             onClick={() => setActiveTab('presets')}
-            className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 ${
+            className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'presets'
                 ? 'border-[#007acc] text-white'
                 : 'border-transparent text-[#858585] hover:text-[#cccccc]'
@@ -101,8 +120,20 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab('saved')}
+            className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'saved'
+                ? 'border-[#007acc] text-white'
+                : 'border-transparent text-[#858585] hover:text-[#cccccc]'
+            }`}
+          >
+            <Film className="w-3.5 h-3.5" />
+            <span>Saved Videos ({savedVideos.length})</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('upload')}
-            className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 ${
+            className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'upload'
                 ? 'border-[#007acc] text-white'
                 : 'border-transparent text-[#858585] hover:text-[#cccccc]'
@@ -114,30 +145,33 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('url')}
-            className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 ${
+            className={`py-2.5 font-medium transition-colors border-b-2 flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'url'
                 ? 'border-[#007acc] text-white'
                 : 'border-transparent text-[#858585] hover:text-[#cccccc]'
             }`}
           >
             <Link className="w-3.5 h-3.5" />
-            <span>Direct Link</span>
+            <span>Link Video / Image</span>
           </button>
         </div>
 
         {/* tab content body */}
         <div className="p-5 max-h-[60vh] overflow-y-auto">
+          {/* curated presets */}
           {activeTab === 'presets' && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {BACKGROUND_PRESETS.map((preset) => {
                 const isSelected =
-                  (config.type === 'preset' && config.presetId === preset.id) ||
-                  (config.type === 'rock' && preset.type === 'rock');
+                  !activeVideoId &&
+                  ((config.type === 'preset' && config.presetId === preset.id) ||
+                    (config.type === 'rock' && preset.type === 'rock'));
 
                 return (
                   <div
                     key={preset.id}
                     onClick={() => {
+                      clearActiveVideo();
                       onSelectPreset(preset.id);
                       onClose();
                     }}
@@ -170,6 +204,72 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
             </div>
           )}
 
+          {/* saved video wallpapers library */}
+          {activeTab === 'saved' && (
+            <div className="space-y-2">
+              {savedVideos.length === 0 ? (
+                <div className="text-center py-10 text-xs text-[#858585] border border-dashed border-[#2d2d2d] rounded-xl p-6">
+                  No saved videos yet. Link an MP4 or WebM video under the &ldquo;Link Video / Image&rdquo; tab to download and save it here.
+                </div>
+              ) : (
+                savedVideos.map((item) => {
+                  const isActive = activeVideoId === item.id;
+
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        selectSavedVideo(item.id);
+                        onClose();
+                      }}
+                      className={`flex items-center justify-between p-3 rounded-xl border transition-colors cursor-pointer ${
+                        isActive
+                          ? 'bg-[#007acc]/10 border-[#007acc]'
+                          : 'bg-[#202020] border-[#2c2c2c] hover:bg-[#252526]'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <div className="w-9 h-9 rounded-lg bg-black/40 border border-white/10 flex items-center justify-center text-[#38bdf8] shrink-0">
+                          <Play className="w-4 h-4 fill-current" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center space-x-2">
+                            <h4 className="text-xs font-semibold text-white truncate">
+                              {item.name}
+                            </h4>
+                            {isActive && (
+                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#007acc] text-white font-medium">
+                                Active
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-[#858585] block truncate mt-0.5">
+                            {item.sizeFormatted} &bull; {new Date(item.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2 shrink-0 ml-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeSavedVideo(item.id);
+                          }}
+                          className="p-1.5 rounded-lg text-red-400/70 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
+                          title="Delete saved video"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* upload local image */}
           {activeTab === 'upload' && (
             <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#333333] hover:border-[#007acc] rounded-xl p-8 transition-colors text-center">
               <input
@@ -191,7 +291,7 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 bg-[#007acc] hover:bg-[#0062a3] text-white text-xs font-medium rounded-lg transition-colors flex items-center space-x-1.5"
+                className="px-4 py-2 bg-[#007acc] hover:bg-[#0062a3] text-white text-xs font-medium rounded-lg transition-colors flex items-center space-x-1.5 cursor-pointer"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Browse Files</span>
@@ -199,43 +299,56 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
             </div>
           )}
 
+          {/* direct video or image link with name input and real-time download */}
           {activeTab === 'url' && (
-            <form onSubmit={handleApplyUrl} className="space-y-4">
+            <form onSubmit={handleApplyUrl} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-medium text-[#cccccc] mb-1.5">
-                  Direct Image or Video URL
+                <label className="block text-xs font-medium text-[#cccccc] mb-1">
+                  Wallpaper Title
+                </label>
+                <input
+                  type="text"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  placeholder="e.g. Cyberpunk Rain Skyline"
+                  className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-xs text-white placeholder-[#666666] outline-none focus:border-[#007acc]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#cccccc] mb-1">
+                  Direct Video or Image URL
                 </label>
                 <input
                   type="text"
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
-                  placeholder="https://example.com/wallpaper.jpg (or .mp4)"
-                  autoFocus
+                  placeholder="https://...mp4 (or image url)"
                   className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-xs text-white placeholder-[#666666] outline-none focus:border-[#007acc]"
                 />
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 pt-1">
                 <input
                   type="checkbox"
                   id="is-video-checkbox"
                   checked={isUrlVideo}
                   onChange={(e) => setIsUrlVideo(e.target.checked)}
-                  className="rounded bg-[#222222] border-[#333333] text-[#007acc] focus:ring-0"
+                  className="rounded bg-[#222222] border-[#333333] text-[#007acc] focus:ring-0 cursor-pointer"
                 />
                 <label htmlFor="is-video-checkbox" className="text-xs text-[#858585] flex items-center space-x-1 cursor-pointer">
-                  <Film className="w-3.5 h-3.5" />
-                  <span>This is a direct video link (.mp4 / .webm)</span>
+                  <Film className="w-3.5 h-3.5 text-[#007acc]" />
+                  <span>Download and cache video locally for fast playback</span>
                 </label>
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end pt-3 border-t border-[#262626]">
                 <button
                   type="submit"
                   disabled={!urlInput.trim()}
-                  className="px-4 py-2 bg-[#007acc] hover:bg-[#0062a3] disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-[#007acc] hover:bg-[#0062a3] disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer"
                 >
-                  Apply Wallpaper
+                  {isUrlVideo ? 'Download & Set Video' : 'Apply Wallpaper'}
                 </button>
               </div>
             </form>

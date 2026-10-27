@@ -13,3 +13,8 @@ export * from './widgets/WeatherWidget';
 export * from './widgets/EmbedWidget';
 export * from './widgets/NotesWidget';
 export * from './widgets/ClockWidget';
+export * from './videoStorage';
+export * from './VideoDownloadContext';
+export * from './VideoDownloadHUD';
+export * from './useBackgroundStore';
+export * from './BackgroundPickerModal';

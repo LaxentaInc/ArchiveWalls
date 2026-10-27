@@ -246,7 +246,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
           <button
             type="button"
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 text-[#666666] hover:text-[#cccccc] transition-colors"
+            className="p-1 text-[#666666] hover:text-[#cccccc] transition-colors cursor-pointer"
             title="Widget options"
           >
             <MoreHorizontal className="w-3.5 h-3.5" />
@@ -264,7 +264,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
                   setShowMenu(false);
                   setIsEditingTitle(true);
                 }}
-                className="w-full text-left px-3 py-1.5 hover:bg-[#2a2a2a] hover:text-white transition-colors flex items-center space-x-1.5"
+                className="w-full text-left px-3 py-1.5 hover:bg-[#2a2a2a] hover:text-white transition-colors flex items-center space-x-1.5 cursor-pointer"
               >
                 <Edit2 className="w-3 h-3 text-[#888888]" />
                 <span>Rename</span>
@@ -280,7 +280,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSetColSpan(1)}
-                    className={`w-full text-left px-3 py-1.5 hover:bg-[#2a2a2a] transition-colors flex items-center justify-between ${
+                    className={`w-full text-left px-3 py-1.5 hover:bg-[#2a2a2a] transition-colors flex items-center justify-between cursor-pointer ${
                       colSpan === 1 ? 'text-[#007acc] font-medium' : 'text-[#cccccc]'
                     }`}
                   >
@@ -290,7 +290,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSetColSpan(2)}
-                    className={`w-full text-left px-3 py-1.5 hover:bg-[#2a2a2a] transition-colors flex items-center justify-between ${
+                    className={`w-full text-left px-3 py-1.5 hover:bg-[#2a2a2a] transition-colors flex items-center justify-between cursor-pointer ${
                       colSpan === 2 ? 'text-[#007acc] font-medium' : 'text-[#cccccc]'
                     }`}
                   >
@@ -300,7 +300,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSetColSpan(4)}
-                    className={`w-full text-left px-3 py-1.5 hover:bg-[#2a2a2a] transition-colors flex items-center justify-between ${
+                    className={`w-full text-left px-3 py-1.5 hover:bg-[#2a2a2a] transition-colors flex items-center justify-between cursor-pointer ${
                       colSpan === 4 ? 'text-[#007acc] font-medium' : 'text-[#cccccc]'
                     }`}
                   >
@@ -317,7 +317,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
                   setShowMenu(false);
                   onRemove(widget.id);
                 }}
-                className="w-full text-left px-3 py-1.5 hover:bg-red-500/10 text-red-400 hover:text-red-300 flex items-center space-x-1.5 transition-colors"
+                className="w-full text-left px-3 py-1.5 hover:bg-red-500/10 text-red-400 hover:text-red-300 flex items-center space-x-1.5 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-3 h-3" />
                 <span>Delete</span>

@@ -3,6 +3,9 @@
   "name": "Archive Walls",
   "version": "0.1.0",
   "description": "Live wallpaper new tab, visual bookmark hub, and ColorWall desktop web clipper",
+  "chrome_url_overrides": {
+    "newtab": "src/newtab/index.html"
+  },
   "background": {
     "service_worker": "src/background/service-worker.ts",
     "type": "module"
@@ -14,6 +17,9 @@
     "downloads",
     "activeTab",
     "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "action": {
     "default_title": "Archive Walls"

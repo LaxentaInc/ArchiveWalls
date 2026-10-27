@@ -26,6 +26,10 @@
   input {
     user-select: text;
   }
+
+  button, [role="button"], a, select, summary {
+    cursor: pointer !important;
+  }
 }
 
 .font-outfit {
