@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+/* global styling and typography resets */
+
+@layer base {
+  :root {
+    --font-outfit: 'Outfit', sans-serif;
+    --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #050507;
+    color: #f3f4f6;
+    font-family: var(--font-jakarta);
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  input {
+    user-select: text;
+  }
+}
+
+.font-outfit {
+  font-family: var(--font-outfit);
+}
+
+.font-jakarta {
+  font-family: var(--font-jakarta);
+}
