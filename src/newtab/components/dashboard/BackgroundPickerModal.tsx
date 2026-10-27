@@ -149,6 +149,8 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
     setNameInput('');
   };
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 select-none">
       <div className="relative w-full max-w-2xl bg-[#181818] border border-[#2a2a2a] rounded-2xl overflow-hidden shadow-2xl text-[#cccccc] flex flex-col">
