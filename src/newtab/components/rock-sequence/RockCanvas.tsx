@@ -4,8 +4,12 @@ import { useFramePreloader } from './useFramePreloader';
 import { useSmoothScroll } from './useSmoothScroll';
 import { useRockAnimationLoop } from './useRockAnimationLoop';
 
+interface RockCanvasProps {
+  containerRef?: React.RefObject<HTMLDivElement | null>;
+}
+
 // canvas component managing rock frame rendering and wheel interaction
-export const RockCanvas: React.FC = () => {
+export const RockCanvas: React.FC<RockCanvasProps> = ({ containerRef }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const { imagesRef, imagesLoaded, isInitialFrameReady } = useFramePreloader();
@@ -13,6 +17,7 @@ export const RockCanvas: React.FC = () => {
 
   useRockAnimationLoop({
     canvasRef,
+    containerRef,
     imagesRef,
     targetFrameRef,
     isInitialFrameReady,
