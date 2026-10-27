@@ -22,7 +22,7 @@ import { Plus, Image as ImageIcon } from 'lucide-react';
 // dynamic background view rendering either indexeddb cached video, nature preset, 3d rocks, or custom upload
 const BackgroundView: React.FC = () => {
   const bgStore = useBackgroundStore();
-  const { activeVideoUrl } = useVideoDownload();
+  const { activeVideoUrl, clearActiveVideo } = useVideoDownload();
 
   // prioritized active video wallpaper from indexeddb or direct stream
   if (activeVideoUrl) {
@@ -35,6 +35,10 @@ const BackgroundView: React.FC = () => {
           loop
           muted
           playsInline
+          onError={() => {
+            // clear broken video and fall back to presets if decode or stream fails
+            clearActiveVideo();
+          }}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/40" />

@@ -65,13 +65,27 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
     reader.readAsDataURL(file);
   };
 
-  // initiates video download or sets image url with user-specified name
+  // initiates video download or sets image url with user-specified or auto-derived name
   const handleApplyUrl = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!urlInput.trim()) return;
 
     const trimmedUrl = urlInput.trim();
-    const trimmedName = nameInput.trim() || 'Custom Wallpaper';
+    
+    // auto-extract readable title from url filename if name input was left empty
+    let trimmedName = nameInput.trim();
+    if (!trimmedName) {
+      try {
+        const parsed = new URL(trimmedUrl);
+        const filename = parsed.pathname.split('/').pop()?.split('.')[0];
+        if (filename && filename.length > 1) {
+          trimmedName = decodeURIComponent(filename)
+            .replace(/[-_]/g, ' ')
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+        }
+      } catch {}
+      if (!trimmedName) trimmedName = 'Video Wallpaper';
+    }
 
     if (isUrlVideo || trimmedUrl.endsWith('.mp4') || trimmedUrl.endsWith('.webm')) {
       onClose();
@@ -326,6 +340,9 @@ export const BackgroundPickerModal: React.FC<BackgroundPickerModalProps> = ({
                   placeholder="https://...mp4 (or image url)"
                   className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-xs text-white placeholder-[#666666] outline-none focus:border-[#007acc]"
                 />
+                <p className="text-[10px] text-[#707070] mt-1.5 leading-relaxed">
+                  Provide direct file links (e.g. .mp4, .webm, or image urls). Web page links like YouTube cannot be stored as raw video files.
+                </p>
               </div>
 
               <div className="flex items-center space-x-2 pt-1">

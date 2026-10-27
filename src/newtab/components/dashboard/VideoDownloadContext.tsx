@@ -33,6 +33,7 @@ interface VideoDownloadContextType {
   removeSavedVideo: (id: string) => Promise<void>;
   cancelDownload: () => void;
   clearActiveVideo: () => void;
+  clearError: () => void;
 }
 
 const STORAGE_SAVED_VIDEOS = 'archive_walls_saved_videos';
@@ -232,6 +233,7 @@ export const VideoDownloadProvider: React.FC<{ children: React.ReactNode }> = ({
         setActiveVideoUrl(objUrl);
 
         setIsDownloading(false);
+        setError(null);
         return true;
       } catch (err: unknown) {
         if ((err as Error).name === 'AbortError') {
@@ -239,21 +241,11 @@ export const VideoDownloadProvider: React.FC<{ children: React.ReactNode }> = ({
           return false;
         }
 
-        // if cors blocks chunk reading fallback to saving metadata and direct streaming
-        const fallbackItem: SavedVideoItem = {
-          id: videoId,
-          name: videoName,
-          url,
-          sizeFormatted: 'Streaming (CORS)',
-          cachedInIndexedDb: false,
-          createdAt: Date.now(),
-        };
-
-        setSavedVideos((prev) => [fallbackItem, ...prev]);
-        setActiveVideoId(videoId);
-        setActiveVideoUrl(url);
+        // report readable failure message to hud instead of activating a broken url
+        const errorMsg = (err as Error).message || 'Unable to download or stream video from URL';
+        setError(errorMsg);
         setIsDownloading(false);
-        return true;
+        return false;
       }
     },
     []
@@ -309,6 +301,11 @@ export const VideoDownloadProvider: React.FC<{ children: React.ReactNode }> = ({
     setActiveVideoUrl(null);
   }, []);
 
+  // clears current error message
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   return (
     <VideoDownloadContext.Provider
       value={{
@@ -327,6 +324,7 @@ export const VideoDownloadProvider: React.FC<{ children: React.ReactNode }> = ({
         removeSavedVideo,
         cancelDownload,
         clearActiveVideo,
+        clearError,
       }}
     >
       {children}
