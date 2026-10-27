@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Archive Walls",
   "version": "0.1.0",
-  "description": "Live wallpaper new tab, visual bookmark hub, and ColorWall desktop web clipper",
+  "description": "Live wallpaper new tab, unmatched bookmark manager, and ColorWall desktop web clipper",
   "chrome_url_overrides": {
     "newtab": "src/newtab/index.html"
   },
