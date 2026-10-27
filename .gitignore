@@ -1,0 +1,31 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# production builds
+dist
+dist-ssr
+*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor & os
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+Thumbs.db
+
+# environment variables
+.env
+.env.*
+!.env.example
