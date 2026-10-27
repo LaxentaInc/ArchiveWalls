@@ -3,6 +3,7 @@
 export { RockBackground } from './RockBackground';
 export { RockCanvas } from './RockCanvas';
 export { SpaceDustCanvas } from './SpaceDustCanvas';
+export { AmbientGlow } from './AmbientGlow';
 export { AuroraCanvas } from './AuroraCanvas';
 export { renderRockFrame } from './canvasRenderer';
 export { useFramePreloader } from './useFramePreloader';
