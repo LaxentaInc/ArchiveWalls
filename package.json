@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test:chrome": "powershell -Command \"Start-Process chrome -ArgumentList '--load-extension=' + (Get-Location).Path + '\\dist', '--new-window', 'chrome://newtab'\""
+    "test:chrome": "powershell -Command \"Start-Process chrome -ArgumentList \\\"--load-extension=$PWD\\dist\\\", '--new-window', 'chrome://newtab'\""
   },
   "dependencies": {
     "clsx": "^2.1.1",
