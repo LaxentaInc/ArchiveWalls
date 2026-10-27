@@ -5,9 +5,10 @@ import {
   SCROLL_MULTIPLIER,
   SCROLL_LERP_FACTOR,
   SCROLL_SNAP_THRESHOLD,
+  AMBIENT_DRIFT_SPEED,
 } from './constants';
 
-// momentum based wheel scroll physics hook for driving frame index
+// momentum based wheel scroll physics hook with 3x ambient auto rotation
 export function useSmoothScroll() {
   const targetFrameRef = useRef<number>(1);
   const scrollPositionRef = useRef<number>(0);
@@ -38,9 +39,9 @@ export function useSmoothScroll() {
     let rafId: number;
 
     const loop = () => {
-      // if user is idle, add subtle ambient drift rotation
+      // if user is idle, add 3x ambient drift rotation
       if (!isInteractingRef.current) {
-        targetPositionRef.current = (targetPositionRef.current + 0.8) % maxScroll;
+        targetPositionRef.current = (targetPositionRef.current + AMBIENT_DRIFT_SPEED) % maxScroll;
       }
 
       let current = scrollPositionRef.current;
