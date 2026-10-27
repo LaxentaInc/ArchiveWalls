@@ -149,7 +149,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
       {/* seamless header sharing the exact same background with zero divider line */}
       <div
         onPointerDown={handlePointerDown}
-        className="px-4 pt-3 pb-1.5 flex items-center justify-between cursor-grab active:cursor-grabbing select-none bg-transparent"
+        className="px-3.5 pt-2.5 pb-1 flex items-center justify-between cursor-grab active:cursor-grabbing select-none bg-transparent"
       >
         {/* drag grip and title rename input */}
         <div className="flex items-center space-x-1.5 flex-1 min-w-0 mr-2">
@@ -328,7 +328,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
       </div>
 
       {/* widget body seamlessly attached without separation lines */}
-      <div className={isEdgeToEdge ? 'w-full rounded-b-xl overflow-hidden' : 'px-4 pb-4 pt-1.5'}>{children}</div>
+      <div className={isEdgeToEdge ? 'w-full rounded-b-xl overflow-hidden' : 'px-3.5 pb-3 pt-1'}>{children}</div>
 
       {/* invisible interactive right border resize grip without visual divider lines */}
       {onUpdateColSpan && (

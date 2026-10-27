@@ -30,23 +30,23 @@ export const SearchBar: React.FC = () => {
     <div className="relative w-full max-w-2xl mx-auto">
       <form
         onSubmit={handleSearch}
-        className="relative w-full flex items-center bg-[#1e1e1e] hover:bg-[#252526] focus-within:bg-[#252526] transition-colors border border-[#2d2d2d] focus-within:border-[#007acc] rounded-full px-4 py-2 text-[#cccccc]"
+        className="relative w-full h-[50px] flex items-center bg-[#1e1e1e] hover:bg-[#252526] focus-within:bg-[#252526] transition-colors border border-[#2d2d2d] focus-within:border-[#007acc] rounded-full px-5 text-[#cccccc] shadow-lg"
       >
         {/* search engine selector button */}
         <div className="relative shrink-0">
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex items-center space-x-1 text-[#858585] hover:text-[#cccccc] mr-3 pr-2 border-r border-[#333333] transition-colors focus:outline-none"
+            className="flex items-center space-x-1.5 text-[#858585] hover:text-[#cccccc] mr-3.5 pr-2.5 border-r border-[#333333] transition-colors focus:outline-none"
             title={`Search engine: ${selectedEngine.name}`}
           >
-            <Globe className="w-3.5 h-3.5" />
-            <ChevronDown className="w-3 h-3 text-[#858585]" />
+            <Globe className="w-4 h-4" />
+            <ChevronDown className="w-3.5 h-3.5 text-[#858585]" />
           </button>
 
           {/* engine dropdown popover */}
           {isMenuOpen && (
-            <div className="absolute top-9 left-0 z-50 bg-[#252526] border border-[#3c3c3c] rounded-lg py-1 min-w-[130px] shadow-2xl">
+            <div className="absolute top-11 left-0 z-50 bg-[#252526] border border-[#3c3c3c] rounded-lg py-1 min-w-[140px] shadow-2xl">
               {SEARCH_ENGINES.map((engine) => (
                 <button
                   key={engine.id}
@@ -55,7 +55,7 @@ export const SearchBar: React.FC = () => {
                     setSelectedEngine(engine);
                     setIsMenuOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-1.5 text-xs transition-colors flex items-center justify-between ${
+                  className={`w-full text-left px-3 py-2 text-xs transition-colors flex items-center justify-between ${
                     selectedEngine.id === engine.id
                       ? 'text-[#007acc] bg-white/5 font-medium'
                       : 'text-[#cccccc] hover:text-white hover:bg-[#2a2d2e]'
@@ -75,14 +75,14 @@ export const SearchBar: React.FC = () => {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search the web"
           autoFocus
-          className="w-full bg-transparent text-sm text-white placeholder-white/40 outline-none font-normal"
+          className="w-full bg-transparent text-sm text-[#cccccc] placeholder-[#777777] outline-none font-normal"
         />
 
         {/* submit button */}
         <button
           type="submit"
           aria-label="Submit search"
-          className="p-1 text-white/40 hover:text-white transition-colors shrink-0"
+          className="p-1.5 text-[#858585] hover:text-white transition-colors shrink-0"
         >
           <Search className="w-4 h-4" />
         </button>

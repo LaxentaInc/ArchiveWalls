@@ -176,7 +176,7 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
   return (
     <div
       ref={gridContainerRef}
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start w-full max-w-[1680px] mx-auto px-4 sm:px-6 py-2 select-none"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start w-full px-4 sm:px-6 lg:px-8 py-2 select-none"
     >
       {/* render widgets and drop placeholder at calculated target slot */}
       {filteredWidgets.map((widget, itemIdx) => {
