@@ -36,7 +36,7 @@ export const DEFAULT_WALLPAPERS: Wallpaper[] = [
 ];
 
 export const DEFAULT_SETTINGS: NewTabSettings = {
-  activeWallpaperId: 'test1',
+  activeWallpaperId: 'test2',
   clockFormat: '12h',
   showClock: true,
   showSearch: true,
